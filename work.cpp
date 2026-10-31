@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <format>
+#include <future>
 
 using namespace std;
 
@@ -25,6 +26,26 @@ namespace sequential
                               quick("B1");
                               quick("B2");
                               slow("B3");
+                              quick("C"); });
+        report(t);
+    }
+}
+
+namespace parallel
+{
+    void work()
+    {
+        double t = timeit([]
+                          {
+                              auto chainB = async(launch::async, []
+                                                  {
+                                                      quick("B1");
+                                                      quick("B2");
+                                                      slow("B3"); });
+                              slow("A1");
+                              quick("A2");
+                              quick("A3");
+                              chainB.get();
                               quick("C"); });
         report(t);
     }
